@@ -16,6 +16,7 @@ fn main() {
         .add_systems(Startup, setup_camera)
         .add_plugins(BallPlugin)
         .add_plugins(PhysicsPlugins::default())
+        .insert_resource(Gravity(Vec2::new(0.0, -500.0)))
         .run();
 }
 
