@@ -1,10 +1,25 @@
 mod plugins;
+mod protocol;
+mod websocket;
 
 use avian2d::prelude::*;
 use bevy::prelude::*;
 use plugins::ball::BallPlugin;
+use protocol::SpawnRequest;
+use std::sync::Mutex;
+use std::sync::mpsc;
+use websocket::{SpawnReceiver, handle_websocket_spawns, run_server};
 
 fn main() {
+    let (tx, rx) = mpsc::channel::<SpawnRequest>();
+
+    // Start the websocket service on a parallel thread.
+    std::thread::spawn(move || {
+        tokio::runtime::Runtime::new()
+            .unwrap()
+            .block_on(run_server(tx))
+    });
+
     App::new()
         .add_plugins(DefaultPlugins.set(WindowPlugin {
             primary_window: Some(Window {
@@ -14,9 +29,11 @@ fn main() {
             ..default()
         }))
         .add_systems(Startup, (setup_camera, setup_walls))
+        .add_systems(Update, handle_websocket_spawns)
         .add_plugins(BallPlugin)
         .add_plugins(PhysicsPlugins::default())
         .insert_resource(Gravity(Vec2::new(0.0, -500.0)))
+        .insert_resource(SpawnReceiver(Mutex::new(rx)))
         .run();
 }
 

@@ -2,16 +2,12 @@ use avian2d::prelude::*;
 use bevy::prelude::*;
 use rand::RngExt;
 
+use crate::protocol::SpawnBallMessage;
+
 pub struct BallPlugin;
 
 #[derive(Resource)]
 struct SpawnTimer(Timer);
-
-#[derive(Message)]
-struct SpawnBallMessage {
-    position: Vec2,
-    velocity: Vec2,
-}
 
 fn spawn_ball_handler(
     mut commands: Commands,
