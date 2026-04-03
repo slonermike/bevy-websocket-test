@@ -1,3 +1,4 @@
+use avian2d::prelude::*;
 use bevy::prelude::*;
 use rand::RngExt;
 
@@ -9,6 +10,7 @@ struct SpawnTimer(Timer);
 #[derive(Message)]
 struct SpawnBallMessage {
     position: Vec2,
+    velocity: Vec2,
 }
 
 fn spawn_ball_handler(
@@ -22,6 +24,10 @@ fn spawn_ball_handler(
             Mesh2d(meshes.add(Circle::new(25.0))),
             MeshMaterial2d(materials.add(Color::srgb(1.0, 0.0, 0.0))),
             Transform::from_translation(message.position.extend(0.0)),
+            RigidBody::Dynamic,
+            Collider::circle(25.0),
+            Restitution::new(1.0),
+            LinearVelocity(message.velocity),
         ));
     }
 }
@@ -40,6 +46,7 @@ fn spawn_timer_system(
         let rand_y = rng.random_range(-150.0..150.0);
         writer.write(SpawnBallMessage {
             position: Vec2::new(rand_x, rand_y),
+            velocity: Vec2::new(rand_x, rand_y),
         });
 
         let next_duration = rng.random_range(0.5..1.5);

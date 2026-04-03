@@ -1,5 +1,6 @@
 mod plugins;
 
+use avian2d::prelude::*;
 use bevy::prelude::*;
 use plugins::ball::BallPlugin;
 
@@ -14,6 +15,7 @@ fn main() {
         }))
         .add_systems(Startup, setup_camera)
         .add_plugins(BallPlugin)
+        .add_plugins(PhysicsPlugins::default())
         .run();
 }
 
